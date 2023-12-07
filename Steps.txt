@@ -1,0 +1,82 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ANSIBLE START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+# Reference-> https://github.com/vilasvarghese/ansible/blob/master/installation/ssh-setup.txt   
+
+
+
+# Install Pip
+- sudo apt update 
+- sudo apt install python3-pip
+- pip3 --version
+
+
+# Install Ansible
+- pip3 install ansible
+- ansible --version
+
+
+- useradd -m -s /bin/bash ansadmin
+- passwd ansadmin
+        New password: aditya123
+	
+- usermod -aG sudo vilas
+- visudo 
+       change 
+         	%sudo   ALL=(ALL:ALL) ALL
+       to 
+		%sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+
+
+
+#Create SSH key on worker
+- sudo su ansadmin
+- cd
+- mkdir -p ~/.ssh
+- touch ~/.ssh/authorized_keys
+- chmod -R 700 ~/.ssh
+- chmod 600 ~/.ssh/*
+
+
+- sudo vi /etc/ssh/sshd_config
+# Change the things to this 
+	PasswordAuthentication yes
+	PermitRootLogin yes (PermitRootLogin prohibit-password for ubuntu)
+	ClientAliveInterval 1200
+	ClientAliveCountMax 3
+
+sudo vi /etc/hosts
+# add hosts in /etc/hosts
+    #add the following things in the last of that file
+    <pvt Ip of master node>        kmaster
+    <pvt Ip of worker node>        kworker1
+	
+
+- sudo systemctl restart sshd.service
+
+
+#Do the following on source (server)
+	- sudo su - ansadmin
+	- ssh-keygen -t rsa
+        - ls -a
+        - cd .ssh
+	- ssh-copy-id ansadmin@kmaster
+             Password- aditya123                          # Created while creating user i.e ansadmin
+        - ssh <pvt IP of Kmaster>
+
+
+# Content to paste is there in the repo 
+- vi inventory.ini                                        # contains a list of hosts on which Ansible will perform tasks.
+- vi kubectl_run.yml                                      # contains the Ansible playbook that defines tasks for interacting with Kubernetes using kubectl.
+
+
+- sudo su                                                 # switches to the superuser (root)
+- cp -r $HOME/.kube /home/ansadmin                        # Copies the Kubernetes configuration directory from the current user's home directory to the home                                                             directory of the ansadmin user. The Kubernetes configuration directory typically contains the                                                             config file, which holds information about clusters, users, and contexts.
+
+- chown ansadmin:ansadmin /home/ansadmin/.kube/config     # Changes the ownership of the copied Kubernetes configuration file to the ansadmin user.
+
+
+
+- sudo su ansadmin
+- kubectl run one --image=nginx                           # Just checking that can we create a pod with this user or not.
+- kubectl delete pod one
+- ansible-playbook -i inventory.ini kubectl_run.yml       # Runs the Ansible playbook defined in the kubectl_run.yml file, using the inventory file                                                                      inventory.ini.
