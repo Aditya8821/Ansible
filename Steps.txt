@@ -1,4 +1,4 @@
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ANSIBLE START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ANSIBLE START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Reference-> https://github.com/vilasvarghese/ansible/blob/master/installation/ssh-setup.txt   
 
@@ -19,7 +19,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ANSIBLE START XXXX
 - passwd ansadmin
         New password: aditya123
 	
-- usermod -aG sudo vilas
+- usermod -aG sudo ansadmin
 - visudo 
        change 
          	%sudo   ALL=(ALL:ALL) ALL
@@ -64,7 +64,7 @@ sudo vi /etc/hosts
         - ssh <pvt IP of Kmaster>
 
 
-# Content to paste is there in the repo 
+# Content to paste is there in https://github.com/adityaofficial88/Ansible
 - vi inventory.ini                                        # contains a list of hosts on which Ansible will perform tasks.
 - vi kubectl_run.yml                                      # contains the Ansible playbook that defines tasks for interacting with Kubernetes using kubectl.
 
@@ -80,3 +80,15 @@ sudo vi /etc/hosts
 - kubectl run one --image=nginx                           # Just checking that can we create a pod with this user or not.
 - kubectl delete pod one
 - ansible-playbook -i inventory.ini kubectl_run.yml       # Runs the Ansible playbook defined in the kubectl_run.yml file, using the inventory file                                                                      inventory.ini.
+
+
+----For Kubeadm reset and Kubeadm init----
+#hope you are working here ansadmin@ip-172-31-90-23:~$ in the terminal for all the following things
+- sudo visudo    
+  Paste ansadmin ALL=(ALL:ALL) NOPASSWD: ALL  below this line root    ALL=(ALL:ALL) ALL
+
+- vi kubeadm_reset_init.yml
+   Content to paste is there in https://github.com/adityaofficial88/Ansible kubeadm_reset_init.yml file
+- ansible-playbook -i inventory.ini kubeadm_reset_init.yml  
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ANSIBLE END XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
